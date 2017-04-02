@@ -11,8 +11,9 @@ void launchWeb(int webtype) {
   Serial.println("Server started"); 
 }
 
-void startDNS()
-{ 
+void findBase()
+{
+  
   sprintf(hostString, "ESP_%06X", ESP.getChipId());
   Serial.print("Hostname: ");
   Serial.println(hostString);
@@ -31,6 +32,18 @@ void startDNS()
  if (!MDNS.begin(hostString)) {
     Serial.println("Error setting up MDNS responder!");
   }
- Serial.println("mDNS responder started");
- MDNS.addService("esp", "tcp", 8080); // Announce esp tcp service on port 8080
+
+  Serial.println("Sending mDNS query");
+  int n = MDNS.queryService("esp", "tcp"); // Send out query for esp tcp services
+  Serial.println("mDNS query done");
+  if (n == 0) {
+    Serial.println("no services found");
+  }
+  else 
+    baseIP = String(MDNS.IP(0)[0]) + '.' + String(MDNS.IP(0)[1]) + '.' + String(MDNS.IP(0)[2]) + '.' + String(MDNS.IP(0)[3]);
+  Serial.println(baseIP);
+
+  /******  Add initialization stuff to communicate to base and establish a program table or download existing table  *****/
+  
 }
+
